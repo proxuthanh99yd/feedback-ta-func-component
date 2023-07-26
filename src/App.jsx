@@ -3,12 +3,12 @@ import Form from "./components/Form";
 import List from "./components/List";
 import Items from "./components/Items";
 import Summary from "./components/Summary";
+import { useRef } from "react";
 
 function App() {
-    const [items, setItems] = useState(
-        JSON.parse(localStorage.getItem("reviews")) || []
-    );
+    const [items, setItems] = useState([]);
     const [edit, setEdit] = useState({});
+    const isMounted = useRef(false);
 
     const handleSubmit = (data) => {
         if (edit.id) {
@@ -37,14 +37,22 @@ function App() {
         setItems([...items.filter((el) => el.id !== id)]);
     };
 
-    useEffect(() => {
-        localStorage.getItem("reviews")
-            ? setItems(JSON.parse(localStorage.getItem("reviews")))
-            : localStorage.setItem("reviews", "[]");
-    }, []);
+    // useEffect(() => {
+    //     localStorage.getItem("reviews")
+    //         ? setItems(JSON.parse(localStorage.getItem("reviews")))
+    //         : localStorage.setItem("reviews", "[]");
+    // }, []);
 
     useEffect(() => {
+        if (!isMounted.current) {
+            isMounted.current = true;
+            localStorage.getItem("reviews")
+                ? setItems(JSON.parse(localStorage.getItem("reviews")))
+                : localStorage.setItem("reviews", "[]");
+            return;
+        }
         localStorage.setItem("reviews", JSON.stringify(items));
+        console.log("goi lan 2");
     }, [items]);
 
     return (
